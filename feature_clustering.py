@@ -1,3 +1,31 @@
+import numpy as np
+def prewhiten(input_data, prewhiten_percent):
+   import numpy.matlib
+   ambient = np.percentile(input_data, prewhiten_percent)
+   input_data = np.subtract(input_data, np.matlib.repmat(ambient, input_data.shape[0],input_data.shape[1] ))
+   return input_data
+
+def cluster(data,explained_var):
+   from soundscape_IR.soundscape_viewer import clustering
+   cluster_result=clustering(k=explained_var, pca_percent=0.9, method='kmeans')
+   cluster_result.run(input_data=data,f=np.arange(1,data.shape[1]))
+   print(cluster_result.cluster)
+   
+   return(cluster_result.cluster)
+# Within sample normalization
+def frame_normalization(input, axis=0):
+   t=np.max(input,axis=axis)
+   if axis==0:
+      input=input/np.matlib.repmat(np.max(input, axis=axis),input.shape[0],1)
+   elif axis==1:
+      input=input/np.matlib.repmat(np.max(input, axis=axis).T,input.shape[1],1).T
+      input[np.isnan(input)]=0
+   return input
+
+
+
+
+
 class feature_reduction():
    def __init__(self, input, method):
      W = frame_normalization(input.W, axis=0)
