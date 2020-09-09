@@ -126,7 +126,7 @@ class nmf_gpu:
       self.feature_length=model['save_model']['time_frame'].item()[0][0]
       self.basis_num=model['save_model']['basis_num'].item()[0][0]
 
-class feature_reduction():
+class feature_reduction:
    def __init__(self, input, method):
      W = frame_normalization(input.W, axis=0)
      self.W=W
