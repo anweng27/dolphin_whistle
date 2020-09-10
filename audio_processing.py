@@ -1,12 +1,12 @@
 import numpy as np
- def prewhiten(input_data, prewhiten_percent):
+def prewhiten(input_data, prewhiten_percent):
  import numpy.matlib
  ambient = np.percentile(input_data, prewhiten_percent)
  input_data = np.subtract(input_data, np.matlib.repmat(ambient, input_data.shape[0],input_data.shape[1] ))
  return input_data
 
 # Within sample normalization
- def frame_normalization(input, axis=0):
+def frame_normalization(input, axis=0):
     t=np.max(input,axis=axis)
     if axis==0:
       input=input/np.matlib.repmat(np.max(input, axis=axis),input.shape[0],1)
@@ -15,7 +15,7 @@ import numpy as np
     input[np.isnan(input)]=0
     return input
 
- def plot_spec(input,f_range, x_size=20, y_size=6, start_time=0, end_time=60,x_label='Frequency',y_label='Time'):
+def plot_spec(input,f_range, x_size=20, y_size=6, start_time=0, end_time=60,x_label='Frequency',y_label='Time'):
     import matplotlib.pyplot as plt
     import matplotlib.cm as cm
     fig, ax = plt.subplots(figsize=(x_size, y_size))
@@ -25,8 +25,7 @@ import numpy as np
     ax.set_xlabel(x_label)
     cbar = fig.colorbar(im, ax=ax)
       
- 
- def preprocessing(audio,plot=True):
+def preprocessing(audio,plot=True):
     from soundscape_IR.soundscape_viewer import matrix_operation
     # Prewhiten on temporal scale 
     temp=matrix_operation.prewhiten(audio.data[:,1:], prewhiten_percent=10, axis=0)
