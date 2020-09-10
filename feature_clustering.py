@@ -76,7 +76,7 @@ class feature_reduction():
            matrix = np.log(np.abs(fft(W[:,i])[start:end]))
         else:
            matrix = np.vstack((matrix,np.log(np.abs(fft(W[:,i])[start:end]))))
-        plt.plot(frame_normalization(np.log(np.abs(fft(W[:,i])[start:end]))))
+        plt.plot(frame_normalization(np.log(np.abs(fft(W[:,i])[start:end])),axis=1))
       matrix = frame_normalization(matrix,axis=1)
      
       print(matrix.shape)
