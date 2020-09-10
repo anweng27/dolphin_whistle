@@ -78,7 +78,8 @@ class feature_reduction():
            matrix = np.vstack((matrix,np.log(np.abs(fft(W[:,i])[start:end]))))
         plt.plot(np.log(np.abs(fft(W[:,i])[start:end])))
       print(matrix.shape)
-      self.result = frame_normalization(matrix,axis=1)
+      self.result=matrix
+      #self.result = frame_normalization(matrix,axis=1)
 
 
    def h_seq_cluster(self,H,feature_length):
