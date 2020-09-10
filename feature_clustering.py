@@ -65,8 +65,8 @@ class feature_reduction():
            freq_distribution = np.vstack((freq_distribution,np.mean(reshaped[reshaped[:,0]==i,1:],axis=0)))
      print(freq_distribution.shape)
      self.result = freq_distribution
-
-   def fft_cluster(self,W):
+      
+   def fft_cluster(self,W): 
       import scipy
       from scipy.fft import fft
       import matplotlib.pyplot as plt
@@ -76,11 +76,11 @@ class feature_reduction():
            matrix = np.log(np.abs(fft(W[:,i])[start:end]))
         else:
            matrix = np.vstack((matrix,np.log(np.abs(fft(W[:,i])[start:end]))))
-        plt.plot(frame_normalization(np.log(np.abs(fft(W[:,i])[start:end])),axis=1))
-      matrix = frame_normalization(matrix,axis=1)
-     
+        matrix=frame_normalization(matrix,axis=1)
+      plt.plot(matrix)
       print(matrix.shape)
-      self.result = matrix
+      self.result = matrix 
+
 
    def h_seq_cluster(self,H,feature_length):
      h=H[:,int(np.floor(feature_length/2)):self.feature_length*self.basis_num+int(np.floor(feature_length/2))]
