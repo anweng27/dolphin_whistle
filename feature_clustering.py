@@ -12,8 +12,10 @@ def cluster(data,explained_var):
 def frame_normalization(input, axis=0):
    t=np.max(input,axis=axis)
    if axis==0:
-      input=input/np.matlib.repmat(np.max(input, axis=axis),input.shape[0],1)
+      input=input-np.matlib.repmat(np.min(input, axis=axis),input.shape[0],1)
+      input=input/np.matlib.repmat(np.max(input, axis=axis),input.shape[0],1) 
    elif axis==1:
+      input=input-np.matlib.repmat(np.min(input, axis=axis).T,input.shape[1],1).T
       input=input/np.matlib.repmat(np.max(input, axis=axis).T,input.shape[1],1).T
       input[np.isnan(input)]=0
    return input
