@@ -80,6 +80,20 @@ class feature_reduction():
       print(matrix.shape)
       self.result=matrix
       #self.result = frame_normalization(matrix,axis=1)
+     
+   def autocorrelate_cluster(self,W): 
+      import matplotlib.pyplot as plt
+      np.correlate(data, data, mode='full')
+      for i in range(self.basis_num):
+        if i==0:
+           matrix = np.correlate(W[:,i],W[:,i], mode='full')
+        else:
+           matrix = np.vstack((matrix,W[:,i])
+      print(matrix.shape)
+      self.result=matrix
+      
+
+
 
 
    def h_seq_cluster(self,H,feature_length):
