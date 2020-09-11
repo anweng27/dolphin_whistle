@@ -89,7 +89,7 @@ class feature_reduction():
         if i==0:
            matrix = np.correlate(W[:,i],W[:,i], mode='full')
         else:
-           matrix = np.vstack((matrix,W[:,i])
+           matrix = np.vstack((matrix,np.correlate(W[:,i],W[:,i], mode='full')))
       print(matrix.shape)
       self.result=matrix
 
