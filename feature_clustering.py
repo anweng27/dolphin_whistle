@@ -89,7 +89,7 @@ class feature_reduction():
    
    def autocorrelation_cluster(self,W):
       import matplotlib.pyplot as plt
-      np.correlate(data, data, mode='full')
+ 
       for i in range(self.basis_num):
         if i==0:
            matrix = np.correlate(W[:,i],W[:,i], mode='full')
