@@ -36,6 +36,9 @@ class feature_reduction():
 
      elif method == 'h_seq':
        self.reshaped=self.matrix_reshape(W,f)
+         
+     elif method == 'autocorrelation':
+       self.autocorrelation_cluster(W)
 
    def nmf_reduction(self, f, basis_num2=10, max_iter=200, beta=2, sW=None, sH=None, kernel='gpu'):
      model2=nmf_gpu(1,basis_num2)
@@ -82,7 +85,7 @@ class feature_reduction():
       #self.result = frame_normalization(matrix,axis=1)
      
    
-   def autocorrelate_cluster(self,W):
+   def autocorrelation_cluster(self,W):
       import matplotlib.pyplot as plt
       np.correlate(data, data, mode='full')
       for i in range(self.basis_num):
