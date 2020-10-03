@@ -91,6 +91,7 @@ class audio_processing:
         temp.GetContentFile(temp['title'])
       i = i + 1
     audio = AudioSegment.from_wav(title)
+    print(audio.sf)
     merge= AudioSegment.empty()  
     df = pd.read_table(temp['title'],index_col=0)   
     for i in range(len(df)) : 
