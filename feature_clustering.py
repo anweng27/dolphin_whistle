@@ -64,6 +64,32 @@ class clustering:
     self.cluster=cluster+1
     self.soundscape_scene=soundscape_scene
     self.scene_feature = pd.DataFrame(scene, columns = scene_label) 
+    
+    
+    
+    
+def run_kmeans(self, data):
+    if self.k<1:
+      interia=[]
+      k_try=1
+      while k_try:
+        # Create a kmeans model on our data, using k clusters.
+        kmeans_model = KMeans(n_clusters=k_try, init='k-means++').fit(data)
+
+        # Measuring the explained variation 
+        interia.append(kmeans_model.inertia_)
+        print("k:",k_try, ", explained variation:", 1-interia[k_try-1]/interia[0])
+        if 1-interia[k_try-1]/interia[0] >= self.k:
+          k_final=k_try
+          break
+        else:
+          k_try=k_try+1
+    else:
+      k_final=round(self.k)
+
+    print("Final trial: run ", k_final, " clusters")
+    kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(data)
+    return kmeans_model.labels_
 import numpy as np
 
 def cluster(data,explained_var):
