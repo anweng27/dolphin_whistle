@@ -1,8 +1,74 @@
+class clustering:
+  """
+  Clustering of audio events
+  1. Initiate clustering model
+  2. Run clustering
+  3. Save the features of each cluster as csv
+  4. Save the clustering labels as csv
+  
+  Examples
+  --------
+  >>> cluster_result=clustering(k=0.8,method='kmeans')
+  >>> input_data, f=LTS.input_selection('median')
+  >>> cluster_result.run(input_data, f)
+  >>> cluster_result.save_cluster_feature(filename='Cluster_feature.csv')
+  >>> 
+  >>> analysis_result=data_organize()
+  >>> analysis_result.time_fill(time_vec=cluster_result.time_vec, data=cluster_result.cluster, header='LTS_Median_Cluster')
+  >>> analysis_result.save_csv(filename='Cluster_result.csv')
+  >>>
+  >>> analysis_result.plot_diurnal(1)
+  
+  Parameters
+  ----------
+  k : float (>0)
+      Number of clusters (when k>1). When k <1, algorithm will search an optimal 
+      cluster number so that the clustering result can explan k of data dispersion
+      Default: 2
+      
+  method : 'kmeans'
+      Clustering method.
+      Default: 'kmeans'
+  
+  """
+  def __init__(self, k=2, method='kmeans'):
+    self.k=k
+    self.method=method
+
+  def run(self, input_data, f, standardization=[]):
+    self.time_vec=input_data[:,0]
+    self.f=f
+    input_data=input_data[:,1:]
+
+    # standardization
+    if standardization=='max-min':
+      input_data=input_data-np.matlib.repmat(input_data.min(axis=1), input_data.shape[1],1).T
+      input_data=np.divide(input_data, np.matlib.repmat(input_data.max(axis=1), input_data.shape[1], 1).T)
+    
+
+    input_data[np.isnan(input_data)]=0
+    if self.method=='kmeans':
+      cluster=self.run_kmeans(input_data)
+
+    # extract scene features by percentiles
+    soundscape_scene = np.zeros((np.max(cluster)+1,), dtype=np.object)
+    scene = np.zeros((len(f),np.max(cluster)+2), dtype=np.object)
+    scene[:,0]=f
+    scene_label = np.zeros((np.max(cluster)+2,), dtype=np.object)
+    scene_label[0] = 'Frequency (Hz)'
+    for c in np.arange(np.max(cluster)+1):
+      soundscape_scene[c] = np.percentile(input_data[cluster==c,:], [5, 25, 50, 75, 95], axis=0).T
+      scene[0:len(f),c+1]=soundscape_scene[c][:,2]
+      scene_label[c+1] = 'Scene'+ str(c+1)
+ 
+    self.cluster=cluster+1
+    self.soundscape_scene=soundscape_scene
+    self.scene_feature = pd.DataFrame(scene, columns = scene_label) 
 import numpy as np
 
 def cluster(data,explained_var):
-   from soundscape_IR.soundscape_viewer import clustering
-   cluster_result=clustering(k=explained_var, pca_percent=0.9, method='kmeans')
+   from dolphin_whistle.feature_clustering import clustering
+   cluster_result=clustering(k=explained_var,method='kmeans')
    cluster_result.run(input_data=data,f=np.arange(1,data.shape[1]))
    print(cluster_result.cluster)
    
@@ -19,7 +85,6 @@ def frame_normalization(input, axis=0):
       input=input/np.matlib.repmat(np.max(input, axis=axis).T,input.shape[1],1).T
       input[np.isnan(input)]=0
    return input
-
 
 
 class feature_reduction():
@@ -134,27 +199,30 @@ class feature_reduction():
      Reduced = umap.UMAP(n_neighbors=num_neighbors).fit_transform(self.result)
      self.result = Reduced
 
-   def cluster(self, explained_var, pca_percent=0.9, method='kmeans'):
-     from soundscape_IR.soundscape_viewer import clustering
-     cluster1=clustering(k=explained_var, pca_percent=pca_percent, method=method)
+   def cluster(self, explained_var, method='kmeans',plot=False):
+     from dolphin_whistle.feature_clustering
+     cluster1=clustering(k=explained_var,method=method)
      cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
      print(cluster1.cluster)
+     if plot==True:
+       for n in range(1, np.max(self.cluster_result)+1):
+         model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
      self.cluster_result=cluster1.cluster
      self.cluster_object=cluster1
+     
    
-   def cluster2(self,explained_var, pca_percent=0.9,umap = True,num_neighbors=4,plot=True, method='kmeans'):
+   def cluster2(self,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
      import umap
      #second layer cluster
-     from soundscape_IR.soundscape_viewer import clustering
+     from dolphin_whistle.feature_clustering import clustering
      cluster2_num=np.zeros(np.max(autocorrelation.cluster_result))
-     self.cluster2_num=cluster2_num
      temp = np.zeros(self.cluster_result.shape)
      for n in range(1,np.max(self.cluster_result)+1): #looping through first layer cluster
        if self.umap == True:
          Reduced2 = umap.UMAP(n_neighbors=num_neighbors).fit_transform(model.W[:,np.where(self.cluster_result==n)[0]].T)
        else: 
          Reduced2 = Reduced
-       cluster2=clustering(k=explained_var, pca_percent=1)
+       cluster2=clustering(k=explained_vard)
        cluster2.run(np.hstack((np.arange(Reduced2.shape[0])[None].T, Reduced2)), f=np.arange(2))
        cluster2_num[n-1]=np.max(cluster2.cluster)
        for j in range(1, np.max(cluster2.cluster)+1):
@@ -169,6 +237,7 @@ class feature_reduction():
        self.temp=temp
        self.cluster2_result=cluster2.cluster
        self.cluster2_object=cluster2
+       self.cluster2_num=cluster2_num
 
    def view_clusters(self,cluster_num,cluster_layer=2):
      if cluster_layer==1:
@@ -195,7 +264,7 @@ class feature_reduction():
        for k in range(1,np.max(self.cluster_result)+1):
          for j in range(1,self.cluster2_num[k-1].astype(int)+1):
            species=np.floor(np.where(self.temp==k*100+j)[0]/100).astype(int)
-           print(species)
+           #print(species)
            matrix[cumsum[k-1].astype(int)+(j)][-2]=k
            matrix[cumsum[k-1].astype(int)+(j)][-1]=j
            for t in species:
