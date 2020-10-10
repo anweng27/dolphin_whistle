@@ -11,6 +11,38 @@ from scipy.io import loadmat
 from scipy.io import savemat
 from sklearn.decomposition import non_negative_factorization as NMF_cpu
 
+class save_parameters_revised:
+    def __init__(self):
+        self.platform='python'
+    
+    def supervised_nmf(self, f, W, feature_length, basis_num,H):
+        self.f=f
+        self.W=W
+        self.time_frame=feature_length
+        self.basis_num=basis_num
+        self.H=H
+    
+    def pcnmf(self, f, W, W_cluster, source_num, feature_length, basis_num):
+        self.f=f
+        self.W=W
+        self.W_cluster=W_cluster
+        self.k=source_num
+        self.time_frame=feature_length
+        self.basis_num=basis_num
+
+    def LTS_Result(self, LTS_median, LTS_mean, f, link):
+        self.LTS_median = LTS_median
+        self.LTS_mean = LTS_mean
+        self.f = f
+        self.link = link
+
+    def LTS_Parameters(self, FFT_size, overlap, sensitivity, sampling_freq, channel):
+        self.FFT_size=FFT_size
+        self.overlap=overlap 
+        self.sensitivity=sensitivity 
+        self.sampling_freq=sampling_freq 
+        self.channel=channel
+
 
 class nmf_gpu:
   def __init__(self, feature_length=1, basis_num=60):
@@ -109,8 +141,8 @@ class nmf_gpu:
 
   def save_model(self, filename='NMF_model.mat', folder_id=[]):
       #import save_parameters
-      nmf_model=save_parameters()
-      nmf_model.supervised_nmf(self.f, self.W, self.feature_length, self.basis_num)
+      nmf_model=save_parameters_revised()
+      nmf_model.supervised_nmf(self.f, self.W, self.feature_length, self.basis_num,self.H)
       savemat(filename, {'save_model':nmf_model})
       print('Successfully save to '+filename)
 
