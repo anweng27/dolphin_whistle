@@ -200,7 +200,7 @@ class feature_reduction():
      self.result = Reduced
 
    def cluster(self, explained_var, method='kmeans',plot=False):
-     from dolphin_whistle.feature_clustering
+     from dolphin_whistle.feature_clustering import clustering
      cluster1=clustering(k=explained_var,method=method)
      cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
      print(cluster1.cluster)
