@@ -85,7 +85,7 @@ class clustering:
       k_final=round(self.k)
       
     print("Final trial: run ", k_final, " clusters")
-    kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(data)
+    kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(input_data)
     return kmeans_model.labels_
     
     
