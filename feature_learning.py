@@ -140,6 +140,7 @@ class nmf_gpu:
         cbar2.set_label('Relative amplitude')
 
   def save_model(self, filename='NMF_model.mat', folder_id=[]):
+      from dolphin_whistle.feature_learning import save_parameters_revised
       #import save_parameters
       nmf_model=save_parameters_revised()
       nmf_model.supervised_nmf(self.f, self.W, self.feature_length, self.basis_num,self.H)
@@ -155,5 +156,6 @@ class nmf_gpu:
       model = loadmat(filename)
       self.f=model['save_model']['f'].item()[0]
       self.W=model['save_model']['W'].item()
+      self.H=model['save_model']['H'].item()
       self.feature_length=model['save_model']['time_frame'].item()[0][0]
       self.basis_num=model['save_model']['basis_num'].item()[0][0]
