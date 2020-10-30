@@ -84,9 +84,11 @@ class clustering:
     else:
       k_final=round(self.k
     
-import numpy as np
+                    
+
 
 def cluster(data,explained_var):
+   import numpy as np
    from dolphin_whistle.feature_clustering import clustering
    cluster_result=clustering(k=explained_var,method='kmeans')
    cluster_result.run(input_data=data,f=np.arange(1,data.shape[1]))
@@ -96,6 +98,7 @@ def cluster(data,explained_var):
 # Within sample normalization
 
 def frame_normalization(input, axis=0):
+   import numpy as np
    t=np.max(input,axis=axis)
    if axis==0:
       input=input-np.matlib.repmat(np.min(input, axis=axis),input.shape[0],1)
@@ -108,6 +111,7 @@ def frame_normalization(input, axis=0):
 
 
 class feature_reduction():
+   import numpy as np
    def __init__(self, input, method, umap = False,neighbors=4):
      W = frame_normalization(input.W, axis=0)
      self.W=W
