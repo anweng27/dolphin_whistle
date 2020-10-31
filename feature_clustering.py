@@ -237,11 +237,11 @@ class feature_reduction():
      cluster1=clustering(k=explained_var,method=method)
      cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
      print(cluster1.cluster)
-     if plot==True:
-       for n in range(1, np.max(self.cluster_result)+1):
-         model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
      self.cluster_result=cluster1.cluster
      self.cluster_object=cluster1
+    if plot==True:
+      for n in range(1, np.max(self.cluster_result)+1):
+        model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
      
    
    def cluster2(self,model,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
