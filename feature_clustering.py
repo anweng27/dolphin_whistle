@@ -1,4 +1,15 @@
 from sklearn.cluster import KMeans
+import numpy as np
+import numpy.matlib
+import pandas as pd
+import os
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from scipy.io import loadmat
+from scipy.io import savemat
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+
 class clustering:
   """
   Clustering of audio events
@@ -86,7 +97,7 @@ class clustering:
       k_final=round(self.k)
       
     print("Final trial: run ", k_final, " clusters")
-    kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(input_data)
+    kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(data)
     return kmeans_model.labels_
     
     
@@ -224,7 +235,7 @@ class feature_reduction():
      Reduced = umap.UMAP(n_neighbors=num_neighbors).fit_transform(self.result)
      self.result = Reduced
 
-   def cluster(self, explained_var, method='kmeans',plot=False):
+   def cluster(self,model, explained_var, method='kmeans',plot=False):
      from dolphin_whistle.feature_clustering import clustering
      cluster1=clustering(k=explained_var,method=method)
      cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
@@ -236,18 +247,18 @@ class feature_reduction():
      self.cluster_object=cluster1
      
    
-   def cluster2(self,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
+   def cluster2(self,model,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
      import umap
      #second layer cluster
      from dolphin_whistle.feature_clustering import clustering
-     cluster2_num=np.zeros(np.max(autocorrelation.cluster_result))
+     cluster2_num=np.zeros(np.max(self.cluster_result))
      temp = np.zeros(self.cluster_result.shape)
      for n in range(1,np.max(self.cluster_result)+1): #looping through first layer cluster
        if self.umap == True:
          Reduced2 = umap.UMAP(n_neighbors=num_neighbors).fit_transform(model.W[:,np.where(self.cluster_result==n)[0]].T)
        else: 
          Reduced2 = Reduced
-       cluster2=clustering(k=explained_vard)
+       cluster2=clustering(k=explained_var)
        cluster2.run(np.hstack((np.arange(Reduced2.shape[0])[None].T, Reduced2)), f=np.arange(2))
        cluster2_num[n-1]=np.max(cluster2.cluster)
        for j in range(1, np.max(cluster2.cluster)+1):
@@ -314,7 +325,7 @@ class feature_reduction():
        cbar.ax.tick_params(labelsize = 18)
        cbar.set_label('Percentage', fontsize = 2)
 
-   def check_cluster(self,num):
+   def check_cluster(self,model,num):
      print(self.matrix[num,:-2])
      (a,b)=(self.matrix[num,-2].astype(int),self.matrix[num,-1].astype(int))
      print(a,b)
