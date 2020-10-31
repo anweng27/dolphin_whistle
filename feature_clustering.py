@@ -1,4 +1,3 @@
-from sklearn.cluster import KMeans
 import numpy as np
 import numpy.matlib
 import pandas as pd
@@ -7,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from scipy.io import loadmat
 from scipy.io import savemat
-from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 
 class clustering:
@@ -100,8 +98,7 @@ class clustering:
     kmeans_model = KMeans(n_clusters=k_final, init='k-means++', n_init=10).fit(data)
     return kmeans_model.labels_
     
-    
-import numpy as np                    
+                    
 def cluster(data,explained_var):
    from dolphin_whistle.feature_clustering import clustering
    cluster_result=clustering(k=explained_var,method='kmeans')
