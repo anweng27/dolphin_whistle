@@ -1,5 +1,5 @@
+from sklearn.cluster import KMeans
 class clustering:
-  from sklearn.cluster import KMeans
   """
   Clustering of audio events
   1. Initiate clustering model
