@@ -239,9 +239,9 @@ class feature_reduction():
      print(cluster1.cluster)
      self.cluster_result=cluster1.cluster
      self.cluster_object=cluster1
-    if plot==True:
-      for n in range(1, np.max(self.cluster_result)+1):
-        model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
+     if plot==True:
+        for n in range(1, np.max(self.cluster_result)+1):
+          model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
      
    
    def cluster2(self,model,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
