@@ -287,7 +287,6 @@ class feature_reduction():
          for j in species:
           percentage = 100/len(species)
           matrix[i-1][j] += percentage
-       plot_spec(matrix,[0,np.max(self.cluster_result)],10,10,0.5,7.5,x_label='Species',y_label='Cluster')
   
      if cluster_layer==2:
        matrix=np.zeros((np.sum(self.cluster2_num).astype(int)+1,7+2))
