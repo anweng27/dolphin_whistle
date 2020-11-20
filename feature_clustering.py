@@ -247,6 +247,7 @@ class feature_reduction():
    def cluster2(self,model,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
      import umap
      #second layer cluster
+     model.W = frame_normalization(model.W, axis=0)
      from dolphin_whistle.feature_clustering import clustering
      cluster2_num=np.zeros(np.max(self.cluster_result))
      temp = np.zeros(self.cluster_result.shape)
