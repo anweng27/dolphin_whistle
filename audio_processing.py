@@ -1,8 +1,10 @@
+import plotly.graph_objects as go
 import numpy as np
+
 def prewhiten(input_data, prewhiten_percent):
  import numpy.matlib
  ambient = np.percentile(input_data, prewhiten_percent)
- input_data = np.subtract(input_data, np.matlib.repmat(ambient, input_data.shape[0],input_data.shape[1] ))
+ input_data = np.subtract(input_data, np.matlib.repmat(ambient, input_data.shape[0],input_data.shape[1]))
  return input_data
 
 # Within sample normalization
@@ -15,35 +17,60 @@ def frame_normalization(input, axis=0):
     input[np.isnan(input)]=0
     return input
 
-def plot_spec(input,f_range, x_size=20, y_size=6, start_time=0, end_time=60,x_label='Frequency',y_label='Time'):
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
-    fig, ax = plt.subplots(figsize=(x_size, y_size))
-    im = ax.imshow(input, origin='lower',  aspect='auto', cmap=cm.jet,
-                      extent=[start_time, end_time, f_range[0], f_range[-1]], interpolation='none')
-    ax.set_ylabel(y_label)
-    ax.set_xlabel(x_label)
-    cbar = fig.colorbar(im, ax=ax)
+def plot_spec(input,audio):
+    #import matplotlib.pyplot as plt
+    #import matplotlib.cm as cm
+    #fig, ax = plt.subplots(figsize=(x_size, y_size))
+    #im = ax.imshow(input, origin='lower',  aspect='auto', cmap=cm.jet,
+    #                  extent=[start_time, end_time, f_range[0], f_range[-1]], interpolation='none')
+    #ax.set_ylabel(y_label)
+    #ax.set_xlabel(x_label)
+    #cbar = fig.colorbar(im, ax=ax)
+    fig = go.Figure(data=go.Heatmap(
+        z=input[:,1:].T,
+        x=input[:,0],
+        y=audio.f/1000,
+        colorscale='Jet'))
+    fig.show()
+
       
-def preprocessing(audio,plot=True):
+def preprocessing(audio,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import matrix_operation
     # Prewhiten on temporal scale 
-    temp=matrix_operation.prewhiten(audio.data[:,1:], prewhiten_percent=10, axis=0)
+    temp=matrix_operation.prewhiten(audio.data[:,1:], prewhiten_percent=x_prewhiten, axis=0)
     # Remove the broadband clicks(prewhiten vertically)
-    temp=matrix_operation.prewhiten(temp, prewhiten_percent=80, axis=1)
+    temp=matrix_operation.prewhiten(temp, prewhiten_percent=y_prewhiten, axis=1)
     #Smooth the spectrogram
     from scipy.ndimage import gaussian_filter
-    temp=gaussian_filter(temp, sigma=2)
+    temp=gaussian_filter(temp, sigma=sigma)
     temp[temp<0]=0
     #normalize the energy 
     temp=frame_normalization(temp, axis=1) # It may still be better to normalize the energy of each frame 
     input_data=np.hstack((audio.data[:,0:1], temp))
     # Plot the processed spectrogram
     if plot==True: 
-      plot_spec(input = input_data[:,1:].T,x_size=20,y_size=6,start_time=0,end_time=audio.data[-1,0]-audio.data[0,0],f_range=audio.f)  
+      plot_spec(input = input_data,audio=audio)  
     print(input_data.shape)
     return input_data
 
+def local_max_detector(audio,tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True):
+    from soundscape_IR.soundscape_viewer import tonal_detection
+    detector=tonal_detection(tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten)
+    output, detection=detector.local_max(audio.data, audio.f, threshold=threshold, smooth=smooth)
+    # Use plotly to produce an interactive plot
+    if plot==True:
+      fig = go.Figure(data=go.Heatmap(
+        z=output[:,1:].T,
+        x=output[:,0],
+        y=audio.f/1000,
+        colorscale='Jet'))
+      fig.show()
+      fig.update_layout(
+          autosize=False,
+          width=500,
+          height=500,
+          )
+    return(output)
 
  
 
@@ -106,8 +133,9 @@ class audio_processing:
     return newtitle
 
 
-  
-  def prepare_spectrogram(self, file_no = None, f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512):
+#type of method for preprocessing data: 1-normal preprocessing 2- local max detector
+  def prepare_spectrogram(self, preprocess_type=1, file_no = None, f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
+                         tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     import matplotlib as plt
     import matplotlib.cm as cm
@@ -119,10 +147,14 @@ class audio_processing:
               time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
       self.duration = audio.data[-1,0]-audio.data[0,0]
       print(audio.data.shape)
-      processed_spec=preprocessing(audio)
+      if preprocess_type==1:
+        processed_spec=preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+      if preprocess_type==2:
+        processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
       self.data = processed_spec
       self.f = audio.f
       self.sf = audio.sf
+      self.temp=audio.data
       os.remove(self.title)
       
       
@@ -131,7 +163,11 @@ class audio_processing:
       for j in range(0,len(self.filelist)):
         audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
               time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
-        processed_spec = preprocessing(audio)
+        if preprocess_type==1:
+          processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+        if preprocess_type==2:
+          processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+        self.data = processed_spec
         print(audio.sf)
         totalduration += audio.data[-1,0]-audio.data[0,0]
         if j==0:
@@ -144,5 +180,6 @@ class audio_processing:
       self.f = audio.f
       self.sf = audio.sf  
       self.duration = totalduration
-      plot_spec(input=combined[:,1:].T,x_size=30,y_size=8,start_time=0,end_time=self.duration, f_range=audio.f)
+      plot_spec(input=combined,audio=audio)
       
+
