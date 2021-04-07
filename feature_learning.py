@@ -1,6 +1,6 @@
 # Using GPU enabled NMF to learn spectral features(W) and temporal activations(H) in an unsupervised manner
 import torch
-from pytorchNMF.torchnmf.nmf import NMF
+from pytorch-NMF.torchnmf.nmf import NMF
 import numpy as np
 import numpy.matlib
 import matplotlib.pyplot as plt
