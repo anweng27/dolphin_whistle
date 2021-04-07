@@ -156,9 +156,7 @@ class audio_processing:
       self.sf = audio.sf
       self.temp=audio.data
       os.remove(self.title)
-      
-      
-
+     
     else:
       for j in range(0,len(self.filelist)):
         audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
