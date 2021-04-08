@@ -39,6 +39,8 @@ class clustering:
   method : 'kmeans'
       Clustering method.
       Default: 'kmeans'
+
+  
   
   """
   def __init__(self, k=2, method='kmeans'):
@@ -230,18 +232,43 @@ class feature_reduction():
    def umap_func(self,num_neighbors):
      import umap
      Reduced = umap.UMAP(n_neighbors=num_neighbors).fit_transform(self.result)
+     print(Reduced.shape)
      self.result = Reduced
 
-   def cluster(self,model, explained_var, method='kmeans',plot=False):
+
+   def cluster(self,model, explained_var,eps_input,min_samples_input, method='kmeans',plot=False):
      from dolphin_whistle.feature_clustering import clustering
-     cluster1=clustering(k=explained_var,method=method)
-     cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
-     print(cluster1.cluster)
-     self.cluster_result=cluster1.cluster
-     self.cluster_object=cluster1
-     if plot==True:
-        for n in range(1, np.max(self.cluster_result)+1):
-          model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
+     from sklearn.cluster import DBSCAN
+     if method=='kmeans':
+       cluster1=clustering(k=explained_var,method=method)
+       cluster1.run(input_data=np.hstack((np.arange(self.result.shape[0])[None].T, self.result)), f=np.arange(2)) #f=np.arange(1,self.result.shape[1]))f=np.linspace(4000, 25000, num=111)
+       print(cluster1.cluster)
+       self.cluster_result=cluster1.cluster
+       self.cluster_object=cluster1
+       if plot==True:
+         for n in range(1, np.max(self.cluster_result)+1):
+           model.plot_nmf(plot_type='W',W_list=np.where(self.cluster_result==n)[0])
+     if method=='dbscan':
+       cluster1=DBSCAN(eps=eps_input, min_samples=min_samples_input).fit(self.result)
+       k=cluster1.labels_
+       k=np.array([k])
+       # Save the labels and UMAP result in a table
+       df = pd.DataFrame(np.hstack((k.T, self.result)), columns = ['Label','UMAP_1','UMAP_2']) 
+       import plotly.express as px
+       fig = px.scatter(df, x="UMAP_2", y="UMAP_1", color="Label", opacity=0.5, title="Cluster 1 by dbscan",
+                        width=800, height=800)#,range_x=[y[0],y[-1]],range_y=[x[0],x[-1]]   
+       fig.show()
+       if plot==True:
+         for n in range(-1, np.max(cluster1.labels_)+1):
+           model.plot_nmf(plot_type='W',W_list=np.where(cluster1.labels_==n)[0])
+       if self.umap ==False:
+         cluster1=DBSCAN(eps=eps_input, min_samples=min_samples_input).fit(self.result)
+         fig, ax = plt.subplots(figsize=(8, 7))
+         sc = ax.scatter(self.result[:,0], self.result[:,1], c = cluster1.labels_, alpha=0.7, cmap='rainbow')
+         fig.colorbar(sc)
+         fig.show()
+     else:
+       print("Error: method not defined")
      
    
    def cluster2(self,model,explained_var,umap = True,num_neighbors=4,plot=False, method='kmeans'):
