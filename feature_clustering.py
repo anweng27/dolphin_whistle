@@ -7,6 +7,7 @@ import matplotlib.cm as cm
 from scipy.io import loadmat
 from scipy.io import savemat
 from sklearn.cluster import KMeans
+!pip3 install umap-learn
 
 class clustering:
   """
