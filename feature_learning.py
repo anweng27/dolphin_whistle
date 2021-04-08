@@ -68,8 +68,8 @@ class nmf_gpu:
         # NMF-based feature learning
         data = torch.FloatTensor(input_data)
         net = NMF(data.shape, rank=self.basis_num).cuda()
-        #net.fit_transform(data.cuda(), verbose=True, max_iter=max_iter, tol=1e-18, alpha=alpha, l1_ratio=l1_ratio, beta=beta)
-        net.fit_transform(data.cuda(), verbose=True, max_iter=max_iter, beta=beta, sW=sW, sH=sH, sparse=True)
+        #net.fit(data.cuda(), verbose=True, max_iter=max_iter, tol=1e-18, alpha=alpha, l1_ratio=l1_ratio, beta=beta)
+        net.sparse_fit(data.cuda(), verbose=True, max_iter=max_iter, beta=beta, sW=sW, sH=sH)
         self.W, self.H = net.W.detach().cpu().numpy(), net.H.detach().cpu().numpy()
         data = data.detach().cpu()
       elif kernel=='cpu':
