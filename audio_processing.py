@@ -133,7 +133,7 @@ class audio_processing:
 
 
 #type of method for preprocessing data: 1-normal preprocessing 2- local max detector
-  def prepare_spectrogram(self, preprocess_type=1, file_no = None, f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
+  def prepare_spectrogram(self, preprocess_type=2, file_no = None, f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
                          tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     import matplotlib as plt
