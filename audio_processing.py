@@ -182,7 +182,8 @@ class audio_processing:
       plot_spec(input=combined,audio=audio)
       
       
-  def prepare_testing(self,folder_id):
+  def prepare_testing(self,folder_id,dictionary_name,vmin=None,vmax=None,feature_length=40, basis_num=24, save_id=[], length = 10, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
+                      tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     import audioread
     import os
     from soundscape_IR.soundscape_viewer import audio_visualization
@@ -190,8 +191,11 @@ class audio_processing:
     import pandas as pd 
     import numpy as np
     from soundscape_IR.soundscape_viewer import lts_maker
-    duration=0
-    species_list=['Gg']
+    df = pd.DataFrame()
+    dic=np.load(dictionary_name)
+    feature_num=dic.shape[1]
+    species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt']
+    #species_list=['Sa']
     audio_get=lts_maker()
     for species in species_list:
       audio_get.collect_Gdrive(folder_id=folder_id, file_extension=species, subfolder=True)
@@ -200,10 +204,37 @@ class audio_processing:
         file.GetContentFile(file['title'])
         if file['title'].endswith(".wav") or file['title'].endswith(".WAV"):
           with audioread.audio_open(file['title']) as temp:
-            duration = duration + temp.duration
-    print(duration)
-    self.duration=duration
-  
+            duration=temp.duration
+            self.duration=duration
+            duration = int(duration)
+          if duration> length: 
+            for i in range(0, duration, length): 
+              if i+length < duration:
+                audio = audio_visualization(file['title'], plot_type=plot_type,time_resolution=time_resolution, offset_read=i, duration_read=length, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+                self.sf = audio.sf
+                if preprocess_type==1:
+                  processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+                if preprocess_type==2:
+                  processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+                model=supervised_nmf(feature_length=feature_length, basis_num=feature_num)
+                model.source_num=1
+                model.W_cluster=np.ones(feature_num)*0
+                #model.load_model()
+                model.W=dic 
+                model.supervised_separation(processed_spec, audio.f, iter=50)
+                #model.plot_nmf(plot_type='H')
+                #model.save_model(filename=str(j)+'-'+str(i)+'.mat', folder_id=save_id)
+                self.data = processed_spec
+                self.f = audio.f       
+                if create_table==True:
+                  sum =  np.sum(model.H,axis=1)
+                  arr = np.array([species,file['title'],i])
+                  stacked = np.hstack((arr.reshape(1,-1),sum.reshape(1,-1)))
+                  print(file['title'],i)
+                  df2 = pd.DataFrame(stacked)
+                  df= df.append(df2)
+    df=df.rename(columns={0: 'Species', 1: 'File',2:'Time'})
+    self.df=df
        
     #plot_spec(input=combined,audio=audio) 
   
