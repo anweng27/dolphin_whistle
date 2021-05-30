@@ -1,6 +1,5 @@
 import plotly.graph_objects as go
 import numpy as np
-
 def prewhiten(input_data, prewhiten_percent):
  import numpy.matlib
  ambient = np.percentile(input_data, prewhiten_percent)
@@ -110,7 +109,7 @@ class audio_processing:
     temp.GetContentFile(temp['title'])
     location_cmd="title contains '"+title[:-4]+"' and '"+self.folderid+"' in parents and trashed=false"
     file_list = self.Drive.ListFile({'q': location_cmd}).GetList()
-    i = 0
+    i = 0 
     for file1 in file_list:
       txt = file1['title'].find('txt')
       if(txt != -1):
@@ -156,7 +155,9 @@ class audio_processing:
       self.sf = audio.sf
       self.temp=audio.data
       os.remove(self.title)
-     
+      
+      
+
     else:
       for j in range(0,len(self.filelist)):
         audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
@@ -180,4 +181,29 @@ class audio_processing:
       self.duration = totalduration
       plot_spec(input=combined,audio=audio)
       
-
+      
+  def prepare_testing(self,folder_id):
+    import audioread
+    import os
+    from soundscape_IR.soundscape_viewer import audio_visualization
+    from soundscape_IR.soundscape_viewer import supervised_nmf
+    import pandas as pd 
+    import numpy as np
+    from soundscape_IR.soundscape_viewer import lts_maker
+    duration=0
+    species_list=['Gg']
+    audio_get=lts_maker()
+    for species in species_list:
+      audio_get.collect_Gdrive(folder_id=folder_id, file_extension=species, subfolder=True)
+      audio_get.Gdrive.list_display()
+      for file in audio_get.Gdrive.file_list:
+        file.GetContentFile(file['title'])
+        if file['title'].endswith(".wav") or file['title'].endswith(".WAV"):
+          with audioread.audio_open(file['title']) as temp:
+            duration = duration + temp.duration
+    print(duration)
+    self.duration=duration
+  
+       
+    #plot_spec(input=combined,audio=audio) 
+  
