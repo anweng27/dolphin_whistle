@@ -1,36 +1,4 @@
-Skip to content
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- 
-@anweng27 
-schonkopf
-/
-soundscape_IR
-4
-208
-Code
-Issues
-Pull requests
-2
-Actions
-Projects
-Wiki
-Security
-Insights
-soundscape_IR/soundscape_viewer/source_separation.py /
-@schonkopf
-schonkopf Merge pull request #11 from elainesun442/master
-…
-Latest commit f45680c on May 15
- History
- 4 contributors
-@schonkopf@beetle60214@elainesun442@cwwang1128
-526 lines (455 sloc)  20.9 KB
-  
 """
 Soundscape information retrieval
 Author: Tzu-Hao Harry Lin (schonkopf@gmail.com)
@@ -558,15 +526,4 @@ class supervised_nmf:
     if np.any(np.array(model['save_nmf'][0].dtype.names)=='sparseness'):
       self.sparseness=model['save_nmf']['sparseness'].item()[0][0]
     self.model_check(model)
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+
