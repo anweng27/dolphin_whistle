@@ -231,7 +231,7 @@ class supervised_nmf:
   def save_model(self, filename='NMF_model.mat', folder_id=[]):
     #import save_parameters
     nmf_model=save_parameters()
-    nmf_model.supervised_nmf(self.H)
+    nmf_model.supervised_nmf(self.f, self.W, self.W_cluster, self.source_num, self.feature_length, self.basis_num, self.H)
     savemat(filename, {'save_nmf':nmf_model})
     print('Successifully save to '+filename)
     
@@ -253,11 +253,11 @@ class supervised_nmf:
   
   def load_model(self, filename):
     model = loadmat(filename)
-    #self.W=model['save_nmf']['W'].item()
-    #self.W_cluster=model['save_nmf']['W_cluster'].item()[0]
-    #self.source_num=model['save_nmf']['k'].item()[0][0]
-    #self.feature_length=model['save_nmf']['time_frame'].item()[0][0]
-    #self.basis_num=model['save_nmf']['basis_num'].item()[0][0]
+    self.W=model['save_nmf']['W'].item()
+    self.W_cluster=model['save_nmf']['W_cluster'].item()[0]
+    self.source_num=model['save_nmf']['k'].item()[0][0]
+    self.feature_length=model['save_nmf']['time_frame'].item()[0][0]
+    self.basis_num=model['save_nmf']['basis_num'].item()[0][0]
     self.H=model['save_nmf']['H'].item()
     if np.any(np.array(model['save_nmf'][0].dtype.names)=='sparseness'):
       self.sparseness=model['save_nmf']['sparseness'].item()[0][0]
