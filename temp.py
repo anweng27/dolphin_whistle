@@ -16,8 +16,8 @@ from sklearn.decomposition.nmf import _initialize_nmf as NMF_init
 from sklearn.decomposition.nmf import _update_coordinate_descent as basis_update
 from sklearn.utils import check_array
 git clone https://github.com/schonkopf/soundscape_IR.git
-from soundscape_IR.utility import save_parameters
-from soundscape_IR.utility import gdrive_handle
+from soundscape_IR.soundscape_viewer.utility import save_parameters
+from soundscape_IR.soundscape_viewer.utility import gdrive_handle
 import datetime
 
 class pcnmf:
