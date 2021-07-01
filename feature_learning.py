@@ -42,6 +42,10 @@ class save_parameters_revised:
         self.sensitivity=sensitivity 
         self.sampling_freq=sampling_freq 
         self.channel=channel
+        
+    def local_max_result(self, output, detection):
+        self.output = output
+        self.detection = detection 
 
 
 class nmf_gpu:
