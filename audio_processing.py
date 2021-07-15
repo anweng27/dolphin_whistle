@@ -186,7 +186,7 @@ class audio_processing:
       #plot spectrogram of all audios in the folder 
       plot_spec(input=combined,audio=audio)
       self.data = np.array(combined) 
-      self.duration = totalduration
+      self.duration = total_duration
     self.f = audio.f
     self.sf = audio.sf  
     print('Sampling rate: ',self.sf, ', Duration: ', self.duration)
