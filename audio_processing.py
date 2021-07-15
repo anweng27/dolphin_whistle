@@ -158,7 +158,7 @@ class audio_processing:
       if preprocess_type==1:
         processed_spec=preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
       if preprocess_type==2:
-        processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+        processed_spec=self.local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
       self.data = processed_spec
       self.temp=audio.data
 
@@ -177,7 +177,7 @@ class audio_processing:
         if preprocess_type==1:
           processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
         if preprocess_type==2:
-          processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+          processed_spec=self.local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
         total_duration += audio.data[-1,0]-audio.data[0,0]
         if j==0:
           combined = processed_spec
