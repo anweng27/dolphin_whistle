@@ -93,8 +93,8 @@ class audio_processing:
     # Use plotly to produce an interactive plot
     if plot==True:
       fig = go.Figure(data=go.Heatmap(
-        z=output[:,1:].T,
-        x=output[:,0],
+        z=self.output[:,1:].T,
+        x=self.output[:,0],
         y=audio.f/1000,
         colorscale='Jet'))
       fig.show()
