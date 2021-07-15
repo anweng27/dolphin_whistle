@@ -100,17 +100,13 @@ class audio_processing:
 
 
   def audio_concatenation(self, file_no):
-    import os
-    import numpy as np
-    from pydub import AudioSegment
-    import pandas as pd
     title = self.filelist[file_no]['title']
     temp= self.filelist[file_no]
     temp.GetContentFile(temp['title'])
     location_cmd="title contains '"+title[:-4]+"' and '"+self.folderid+"' in parents and trashed=false"
     file_list = self.Drive.ListFile({'q': location_cmd}).GetList()
     i = 0 
-    for file1 in file_list:
+    for file1 in filelist:
       txt = file1['title'].find('txt')
       if(txt != -1):
         temp= file_list[i]
@@ -131,19 +127,29 @@ class audio_processing:
     self.title = newtitle
     return newtitle
 
-
+###Prepare the spectrogram for NMF to learn features: 
+#If only want to use one audio file in the folder, input a specific 'file_no'
+#If want to process all files in folder, input (file_no=None)
 #type of method for preprocessing data: 1-normal preprocessing 2- local max detector
-  def prepare_spectrogram(self, preprocess_type=2, file_no = None, f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
+#if data is annotated and needs to be concatenated: (annotated=True)
+  def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
                          tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     import matplotlib as plt
     import matplotlib.cm as cm
     import os
+    import audioread
     totalduration = 0 
-
+    #if a file number is specified 
     if file_no != None: 
-      audio = audio_visualization(self.audio_concatenation(file_no), plot_type=plot_type,
+      if annotated:
+        audio = audio_visualization(self.audio_concatenation(file_no), plot_type=plot_type,
               time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+      else: 
+        title = self.filelist[file_no]['title']
+        temp= self.filelist[file_no]
+        temp.GetContentFile(temp['title'])
+        audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
       self.duration = audio.data[-1,0]-audio.data[0,0]
       print(audio.data.shape)
       if preprocess_type==1:
@@ -151,10 +157,37 @@ class audio_processing:
       if preprocess_type==2:
         processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
       self.data = processed_spec
-      self.f = audio.f
-      self.sf = audio.sf
       self.temp=audio.data
-      os.remove(self.title)
+
+    #if all files in the entire folder shall be processed      
+    else:
+      for j in range(0,len(self.filelist)):
+        if annotated: 
+          audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+        else: 
+          title=self.filelist[j]['title']
+          temp= self.filelist[j]
+          temp.GetContentFile(title)
+          audio = audio_visualization(title, plot_type=plot_type,
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+        if preprocess_type==1:
+          processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+        if preprocess_type==2:
+          processed_spec=local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+        print(audio.sf)
+        totalduration += audio.data[-1,0]-audio.data[0,0]
+        if j==0:
+          combined = processed_spec
+        else:
+          combined = np.vstack((combined, processed_spec))
+      #plot spectrogram of all audios in the folder 
+      plot_spec(input=combined,audio=audio)
+      self.data = np.array(combined)     
+    #os.remove(self.title)
+    self.f = audio.f
+    self.sf = audio.sf  
+    self.duration = totalduration
       
       
 
@@ -180,8 +213,8 @@ class audio_processing:
       self.sf = audio.sf  
       self.duration = totalduration
       plot_spec(input=combined,audio=audio)
-      
-      
+    
+###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
   def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'],vmin=None,vmax=None,feature_length=40, basis_num=24, save_id=[], length = 10, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     import audioread
