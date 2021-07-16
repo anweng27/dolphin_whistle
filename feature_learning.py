@@ -65,7 +65,7 @@ class nmf_gpu:
 
       # Modify the input data based the feature width
       if self.feature_length>1:
-        input_data=self.matrix_conv(input_data)
+        input_data=self.matrix_conv(input_data).T
 
       print('Feature learning...')
       if kernel=='gpu':
