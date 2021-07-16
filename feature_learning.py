@@ -61,6 +61,7 @@ class nmf_gpu:
       input_data=input_data[:,1:].T
       baseline=input_data.min()
       input_data=input_data-baseline
+      print('input data shape: ', input_data.shape)
       print('Run NMF')
 
       # Modify the input data based the feature width
@@ -78,7 +79,7 @@ class nmf_gpu:
         data = data.detach().cpu()
       elif kernel=='cpu':
         self.W, self.H, _ = NMF_cpu(input_data, n_components=self.basis_num, beta_loss=beta, alpha=alpha, l1_ratio=l1_ratio)
-
+      print('shape of W & H: ', self.W.shape, ', ', self.H.shape)
       print('Done')
 
   def reconstruct(self):
@@ -97,6 +98,7 @@ class nmf_gpu:
       data=np.zeros((matrix_shape[0]*self.feature_length, matrix_shape[1]-1+self.feature_length))
       for x in range(self.feature_length):
         data[(self.feature_length-(x+1))*matrix_shape[0]:(self.feature_length-x)*matrix_shape[0],x:matrix_shape[1]+x]=input_data
+      print('shape after conversion: ', data.shape)
       return data
 
   def plot_nmf(self, plot_type='Both', W_list=None):
