@@ -152,7 +152,7 @@ class audio_processing:
         title = self.filelist[file_no]['title']
         temp= self.filelist[file_no]
         temp.GetContentFile(temp['title'])
-        audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, offset_read=offset_read, duration_read=duration_read, f_range=f_range, ,FFT_size=FFT_size)
+        audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, offset_read=offset_read, duration_read=duration_read, f_range=f_range,FFT_size=FFT_size)
       self.duration = audio.data[-1,0]-audio.data[0,0]
       print(audio.data.shape)
       if preprocess_type==1:
@@ -166,8 +166,7 @@ class audio_processing:
     else:
       for j in range(0,len(self.filelist)):
         if annotated: 
-          audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
-              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size)
+          audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size)
         else: 
           title=self.filelist[j]['title']
           temp= self.filelist[j]
