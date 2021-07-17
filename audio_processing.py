@@ -139,26 +139,26 @@ class audio_processing:
 #If want to process all files in folder, input (file_no=None)
 #type of method for preprocessing data: 1-normal preprocessing 2- local max detector
 #if data is annotated and needs to be concatenated: (annotated=True)
-  def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,vmin=None,vmax=None, FFT_size=512,
-                         tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
+  def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5, offset_read=0, duration_read=None, FFT_size=512,
+                         localmax_tonal_threshold=0.5, localmax_temporal_prewhiten=25, localmax_spectral_prewhiten=25,localmax_threshold=1, localmax_smooth=1,_plot=True,preprocess_x_prewhiten=10,preprocess_y_prewhiten=80,preprocess_sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     total_duration=0
     #if a file number is specified 
     if file_no != None: 
       if annotated:
         audio = audio_visualization(self.audio_concatenation(file_no), plot_type=plot_type,
-              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+              time_resolution=time_resolution, window_overlap=window_overlap, offset_read=offset_read, duration_read=duration_read, f_range=f_range, FFT_size=FFT_size)
       else: 
         title = self.filelist[file_no]['title']
         temp= self.filelist[file_no]
         temp.GetContentFile(temp['title'])
-        audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+        audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, offset_read=offset_read, duration_read=duration_read, f_range=f_range, ,FFT_size=FFT_size)
       self.duration = audio.data[-1,0]-audio.data[0,0]
       print(audio.data.shape)
       if preprocess_type==1:
-        processed_spec=preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+        processed_spec=preprocessing(audio, plot=plot,x_prewhiten=preprocess_x_prewhiten,y_prewhiten=preprocess_y_prewhiten,sigma=preprocess_sigma)
       if preprocess_type==2:
-        processed_spec=self.local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+        processed_spec=self.local_max_detector(audio,tonal_threshold=localmax_tonal_threshold, temporal_prewhiten=localmax_temporal_prewhiten, spectral_prewhiten=localmax_spectral_prewhiten,threshold=localmax_threshold, smooth=localmax_smooth,plot=plot)
       self.data = processed_spec
       self.temp=audio.data
 
@@ -167,17 +167,17 @@ class audio_processing:
       for j in range(0,len(self.filelist)):
         if annotated: 
           audio = audio_visualization(self.audio_concatenation(j), plot_type=plot_type,
-              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size)
         else: 
           title=self.filelist[j]['title']
           temp= self.filelist[j]
           temp.GetContentFile(title)
           audio = audio_visualization(title, plot_type=plot_type,
-              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size)
         if preprocess_type==1:
-          processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
+          processed_spec = preprocessing(audio, plot=plot,x_prewhiten=preprocess_x_prewhiten,y_prewhiten=preprocess_y_prewhiten,sigma=preprocess_sigma)
         if preprocess_type==2:
-          processed_spec=self.local_max_detector(audio,tonal_threshold=tonal_threshold, temporal_prewhiten=temporal_prewhiten, spectral_prewhiten=spectral_prewhiten,threshold=threshold, smooth=smooth,plot=plot)
+          processed_spec=self.local_max_detector(audio,tonal_threshold=localmax_tonal_threshold, temporal_prewhiten=localmax_temporal_prewhiten, spectral_prewhiten=localmax_spectral_prewhiten,threshold=localmax_threshold, smooth=localmax_smooth,plot=plot)
         total_duration += audio.data[-1,0]-audio.data[0,0]
         if j==0:
           combined = processed_spec
