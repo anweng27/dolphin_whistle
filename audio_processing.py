@@ -140,7 +140,7 @@ class audio_processing:
 #type of method for preprocessing data: 1-normal preprocessing 2- local max detector
 #if data is annotated and needs to be concatenated: (annotated=True)
   def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5, offset_read=0, duration_read=None, FFT_size=512,
-                         localmax_tonal_threshold=0.5, localmax_temporal_prewhiten=25, localmax_spectral_prewhiten=25,localmax_threshold=1, localmax_smooth=1,_plot=True,preprocess_x_prewhiten=10,preprocess_y_prewhiten=80,preprocess_sigma=2):
+                         localmax_tonal_threshold=0.5, localmax_temporal_prewhiten=25, localmax_spectral_prewhiten=25,localmax_threshold=1, localmax_smooth=1, plot=True,preprocess_x_prewhiten=10,preprocess_y_prewhiten=80,preprocess_sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     total_duration=0
     #if a file number is specified 
