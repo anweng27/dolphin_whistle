@@ -113,7 +113,7 @@ class audio_processing:
     location_cmd="title contains '"+title[:-4]+"' and '"+self.folderid+"' in parents and trashed=false"
     file_list = self.Drive.ListFile({'q': location_cmd}).GetList()
     i = 0 
-    for file1 in filelist:
+    for file1 in file_list:
       txt = file1['title'].find('txt')
       if(txt != -1):
         temp= file_list[i]
