@@ -108,6 +108,7 @@ class audio_processing:
 
   def audio_concatenation(self, file_no):
     from pydub import AudioSegment
+    import os
     title = self.filelist[file_no]['title']
     temp= self.filelist[file_no]
     temp.GetContentFile(temp['title'])
