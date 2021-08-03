@@ -201,7 +201,7 @@ class audio_processing:
   def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, basis_num=36, save_id=[], length = 5, fragment_overlap=2, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
-    #from dolphin_whistle.temp import supervised_nmf
+    from soundscape_IR.soundscape_viewer import supervised_nmf
     from soundscape_IR.soundscape_viewer import lts_maker
     df = pd.DataFrame()
     dic=np.load(dictionary_name)
