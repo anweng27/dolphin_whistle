@@ -198,7 +198,7 @@ class audio_processing:
       
     
 ###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
-  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, save_H=False, vmin=None,vmax=None,feature_length=40, basis_num=36, save_id=[], length = 5, fragment_overlap=2, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
+  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, basis_num=36, save_id=[], length = 5, fragment_overlap=2, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     #from dolphin_whistle.temp import supervised_nmf
@@ -219,7 +219,7 @@ class audio_processing:
         file.GetContentFile(file['title'])
         if file['title'].endswith(".wav") or file['title'].endswith(".WAV"):
           #if first time running separation and save model 
-          if save_H:
+          if model_folder==None:
             with audioread.audio_open(file['title']) as temp:
               self.duration=temp.duration
               duration = int(temp.duration)
@@ -233,9 +233,10 @@ class audio_processing:
             self.data = processed_spec
             self.f = audio.f
             print(model.H.shape)
+            model.load_model(file['title']+'.mat')
           else: 
             #if there already exists a mat file for separation data
-            model.load_model(file['title']+'.mat') 
+            model.load_model(filename=model_folder+file['title']+'.mat')
           if model.H.shape[1]> length*model.feature_length: 
             for i in range(0, model.H.shape[1], (length-fragment_overlap)*model.feature_length):
               if i+length*model.feature_length < model.H.shape[1]:
