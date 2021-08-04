@@ -203,6 +203,7 @@ class audio_processing:
     from soundscape_IR.soundscape_viewer import audio_visualization
     from soundscape_IR.soundscape_viewer import supervised_nmf
     from soundscape_IR.soundscape_viewer import lts_maker
+    from dolphin_whistle.feature_learning import save_parameters_revised
     df = pd.DataFrame()
     dic=np.load(dictionary_name)
     feature_num=dic.shape[1]
