@@ -210,7 +210,7 @@ class audio_processing:
     audio_get=lts_maker()
     model=supervised_nmf(feature_length=feature_length, basis_num=feature_num)
     model.source_num=1
-    model.W_cluster=np.ones(feature_num)*0
+    model.W_cluster=np.repeat(np.arange(7),feature_num/7)
     model.W=dic 
     k=-1
     for species in species_list:
