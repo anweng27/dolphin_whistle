@@ -256,7 +256,7 @@ class audio_processing:
     self.H=model.H   
     #plot_spec(input=combined,audio=audio) 
     
-  def examine_fragment_H(self,df,y_test,y_pred,num_test,correctly_classified=True,Species=['Dc','Dd','Gg','Pe','Sa','Sl','Tt'],length,feature_length,basis_num,folder_id,species_num=0,feature_selection=[],plot_H=True, plot_spec=True,plot_heatmap=True,plot_scatter=True):
+  def examine_fragment_H(self,df,y_test,y_pred,num_test,correctly_classified=True,model_folder='',Species=['Dc','Dd','Gg','Pe','Sa','Sl','Tt'],length,feature_length,basis_num,folder_id,species_num=0,feature_selection=[],plot_H=True, plot_spec=True,plot_heatmap=True,plot_scatter=True):
     %matplotlib inline
     arr=[]
     if correctly_classified:
@@ -270,7 +270,7 @@ class audio_processing:
      if df.iloc[i,1]==species_num:
       name,time=df.iloc[i,2],float(df.iloc[i,3])
       x=name+','+str(time)+','+str(i)
-      model.load_model('/content/drive/MyDrive/Feature learning of cetacean whistles/Models/1-10/'+name+'.mat') 
+      model.load_model(model_folder+name+'.mat') 
       if plot_H:
         fig, ax = plt.subplots(figsize=(14, 6))
         im = ax.imshow(model.H[feature_selection,:],
