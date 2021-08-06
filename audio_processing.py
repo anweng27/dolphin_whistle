@@ -8,7 +8,6 @@ from soundscape_IR.soundscape_viewer import audio_visualization
 from soundscape_IR.soundscape_viewer import supervised_nmf
 from soundscape_IR.soundscape_viewer import lts_maker
 from dolphin_whistle.feature_learning import save_parameters_revised
-
 import os
 from pandas import DataFrame
 import seaborn as sns
@@ -66,9 +65,7 @@ def preprocessing(audio,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     return input_data
 
 
-class audio_processing: 
- from dolphin_whistle.audio_processing import preprocessing
- 
+class audio_processing:
   def GetGdrive(self, folder_id = []):
     from pydrive.auth import GoogleAuth
     from pydrive.drive import GoogleDrive
@@ -148,6 +145,7 @@ class audio_processing:
 #if data is annotated and needs to be concatenated: (annotated=True)
   def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5, offset_read=0, duration_read=None, FFT_size=512,
                          localmax_tonal_threshold=0.5, localmax_temporal_prewhiten=25, localmax_spectral_prewhiten=25,localmax_threshold=1, localmax_smooth=1, plot=True,preprocess_x_prewhiten=10,preprocess_y_prewhiten=80,preprocess_sigma=2):
+    from dolphin_whistle.audio_processing import preprocessing
     total_duration=0
     #if a file number is specified 
     if file_no != None: 
@@ -201,6 +199,7 @@ class audio_processing:
 ###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
   def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, save_id=[], length = 5, fragment_overlap=0, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
+    from dolphin_whistle.audio_processing import preprocessing
     df = pd.DataFrame()
     dic=np.load(dictionary_name)
     feature_num=dic.shape[1]
@@ -297,11 +296,11 @@ class audio_processing:
         sum = np.sum(df.iloc[i,5:].astype(float))
         df.iloc[i,5:]=df.iloc[i,5:].astype(float)/sum
         arr.append(i)  
-  if plot_heatmap:
-    print(arr)
-    fig4, ax4 = plt.subplots(figsize=(30,30))  
-    ax4=sns.heatmap(df.set_index('Num').iloc[np.array(arr),4:].astype(float),annot=False,linewidths=.5,ax=ax4,vmax=0.5)
-    ax4.set_xticklabels(np.arange(210))
+    if plot_heatmap:
+     print(arr)
+     fig4, ax4 = plt.subplots(figsize=(30,30))  
+     ax4=sns.heatmap(df.set_index('Num').iloc[np.array(arr),4:].astype(float),annot=False,linewidths=.5,ax=ax4,vmax=0.5)
+     ax4.set_xticklabels(np.arange(210))
 
 
 
