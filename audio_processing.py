@@ -238,24 +238,23 @@ class audio_processing:
           else: 
             #if there already exists a mat file for separation data
             model.load_model(filename=model_folder+file['title']+'.mat')
-          if model.H.shape[1]> length*model.feature_length: 
+          if create_table==True:
+           if model.H.shape[1]> length*model.feature_length:
             for i in range(0, model.H.shape[1], (length-fragment_overlap)*model.feature_length):
-              if i+length*model.feature_length < model.H.shape[1]:
-                detection=model.detection[(model.detection[:,0] >= (i/model.feature_length)) & (model.detection[:,0]<=(i/model.feature_length+length))]
-                print(len(detection[:,0]))
-                if(len(detection[:,0])>detection_row):
-                  H=model.H[:,i:i+length*model.feature_length]
-                  if create_table==True:
-                    k=k+1
-                    sum =  np.sum(H,axis=1)
-                    #sum = np.sum(H>0.01,axis=1)
-                    arr = np.array([k,species,file['title'],i/model.feature_length,len(detection[:,0])])
-                    stacked = np.hstack((arr.reshape(1,-1),np.flip(sum.reshape(1,-1))))
-                    print(k,file['title'],i/model.feature_length,len(detection[:,0]))
-                    df2 = pd.DataFrame(stacked)
-                    df= df.append(df2)
-                else: print('not detected',file['title'],i/model.feature_length)
-              else: print('last fragment too short')
+             if i+length*model.feature_length < model.H.shape[1]:
+              detection=model.detection[(model.detection[:,0] >= (i/model.feature_length)) & (model.detection[:,0]<=(i/model.feature_length+length))]
+              print(len(detection[:,0]))
+              if(len(detection[:,0])>detection_row):
+               H=model.H[:,i:i+length*model.feature_length]
+               k=k+1
+               sum =  np.sum(H,axis=1)
+               arr = np.array([k,species,file['title'],i/model.feature_length,len(detection[:,0])])
+               stacked = np.hstack((arr.reshape(1,-1),np.flip(sum.reshape(1,-1))))
+               print(k,file['title'],i/model.feature_length,len(detection[:,0]))
+               df2 = pd.DataFrame(stacked)
+               df= df.append(df2)
+              else: print('not detected',file['title'],i/model.feature_length)
+             else: print('last fragment too short')
     df=df.rename(columns={0:'Num',1: 'Species', 2: 'File',3:'Time',4:'detection rows'})
     self.df=df 
     self.H=model.H   
