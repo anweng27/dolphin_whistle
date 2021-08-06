@@ -256,7 +256,7 @@ class audio_processing:
     self.H=model.H   
     #plot_spec(input=combined,audio=audio) 
     
-  def examine_fragment_H(self,df,y_test,y_pred,num_test,correctly_classified=True,model_folder='',Species=['Dc','Dd','Gg','Pe','Sa','Sl','Tt'],length,feature_length,basis_num,folder_id,species_num=0,feature_selection=[],plot_H=True, plot_spec=True,plot_heatmap=True,plot_scatter=True):
+  def examine_fragment_H(self,df,y_test,y_pred,num_test,length,feature_length,basis_num,folder_id,Species=['Dc','Dd','Gg','Pe','Sa','Sl','Tt'],model_folder='',correctly_classified=True,species_num=0,feature_selection=[],plot_H=True, plot_spec=True,plot_heatmap=True,plot_scatter=True):
     arr=[]
     if correctly_classified:
      a=num_test[np.where(y_test==y_pred)[0]].astype(int)
