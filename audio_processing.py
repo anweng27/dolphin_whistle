@@ -198,7 +198,7 @@ class audio_processing:
       
     
 ###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
-  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, basis_num=36, save_id=[], length = 5, fragment_overlap=2, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
+  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, save_id=[], length = 5, fragment_overlap=0, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from soundscape_IR.soundscape_viewer import audio_visualization
     from soundscape_IR.soundscape_viewer import supervised_nmf
@@ -219,7 +219,7 @@ class audio_processing:
       for file in audio_get.Gdrive.file_list:
         file.GetContentFile(file['title'])
         if file['title'].endswith(".wav") or file['title'].endswith(".WAV"):
-          #if first time running separation and save model 
+          #if first time running separation and requires saving model 
           if model_folder==None:
             with audioread.audio_open(file['title']) as temp:
               self.duration=temp.duration
