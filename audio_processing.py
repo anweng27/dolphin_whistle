@@ -4,9 +4,14 @@ import pandas as pd
 import matplotlib as plt
 import matplotlib.cm as cm
 import audioread
-
-
-
+from soundscape_IR.soundscape_viewer import audio_visualization
+from soundscape_IR.soundscape_viewer import supervised_nmf
+from soundscape_IR.soundscape_viewer import lts_maker
+from dolphin_whistle.feature_learning import save_parameters_revised
+from dolphin_whistle.audio_processing import preprocessing
+import os
+from pandas import DataFrame
+import seaborn as sns
 
 def prewhiten(input_data, prewhiten_percent):
  import numpy.matlib
@@ -61,11 +66,8 @@ def preprocessing(audio,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     return input_data
 
 
-class audio_processing:
-  from dolphin_whistle.audio_processing import preprocessing
-  import os
+class audio_processing: 
  
-  
   def GetGdrive(self, folder_id = []):
     from pydrive.auth import GoogleAuth
     from pydrive.drive import GoogleDrive
@@ -145,8 +147,6 @@ class audio_processing:
 #if data is annotated and needs to be concatenated: (annotated=True)
   def prepare_spectrogram(self, preprocess_type=2, file_no = None, annotated=False,f_range=[5000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5, offset_read=0, duration_read=None, FFT_size=512,
                          localmax_tonal_threshold=0.5, localmax_temporal_prewhiten=25, localmax_spectral_prewhiten=25,localmax_threshold=1, localmax_smooth=1, plot=True,preprocess_x_prewhiten=10,preprocess_y_prewhiten=80,preprocess_sigma=2):
-    from soundscape_IR.soundscape_viewer import audio_visualization
-    from soundscape_IR.soundscape_viewer import supervised_nmf
     total_duration=0
     #if a file number is specified 
     if file_no != None: 
@@ -200,10 +200,6 @@ class audio_processing:
 ###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
   def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, save_id=[], length = 5, fragment_overlap=0, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
-    from soundscape_IR.soundscape_viewer import audio_visualization
-    from soundscape_IR.soundscape_viewer import supervised_nmf
-    from soundscape_IR.soundscape_viewer import lts_maker
-    from dolphin_whistle.feature_learning import save_parameters_revised
     df = pd.DataFrame()
     dic=np.load(dictionary_name)
     feature_num=dic.shape[1]
@@ -259,4 +255,56 @@ class audio_processing:
     self.df=df 
     self.H=model.H   
     #plot_spec(input=combined,audio=audio) 
+    
+  def examine_fragment_H(self,df,y_test,y_pred,num_test,correctly_classified=True,Species=['Dc','Dd','Gg','Pe','Sa','Sl','Tt'],length,feature_length,basis_num,folder_id,species_num=0,feature_selection=[],plot_H=True, plot_spec=True,plot_heatmap=True,plot_scatter=True):
+    %matplotlib inline
+    arr=[]
+    if correctly_classified:
+     a=num_test[np.where(y_test==y_pred)[0]].astype(int)
+    else:
+     a=num_test[np.where(y_test!=y_pred)[0]].astype(int)
+    model=supervised_nmf(feature_length=feature_length, basis_num=basis_num)
+    model.source_num=1
+    model.W_cluster=np.repeat(np.arange(7),basis_num/7)
+    for i in a:
+     if df.iloc[i,1]==species_num:
+      name,time=df.iloc[i,2],float(df.iloc[i,3])
+      x=name+','+str(time)+','+str(i)
+      model.load_model('/content/drive/MyDrive/Feature learning of cetacean whistles/Models/1-10/'+name+'.mat') 
+      if plot_H:
+        fig, ax = plt.subplots(figsize=(14, 6))
+        im = ax.imshow(model.H[feature_selection,:],
+                       origin='lower',  aspect='auto', extent=[time*40,(time+len)*40,0,basis_num], cmap=cm.jet,interpolation='none')
+        ax.set_title(x)
+        ax.set_ylabel('Basis')
+        ax.set_xlabel('Time Frames')
+        cbar = fig.colorbar(im, ax=ax)
+        cbar.set_label('Relative amplitude')
+      if plot_spec:
+        audio_get=lts_maker()
+        audio_get.collect_Gdrive(folder_id=folder_id, file_extension=Species[species_num], subfolder=True)
+        audio = audio_visualization(filename=name,plot_type='Spectrogram', offset_read=time, duration_read=length, FFT_size=256)
+      if plot_scatter:
+        fig3 = go.Figure(layout=go.Layout(title=go.layout.Title(text=Species[species_num])))
+        if correctly_classified:
+          fig3.add_trace(go.Scatter(x=np.arange(basis_num), y=df.iloc[i, 5:], name=x,line=dict(color='blue', width=2)))
+        #alternative:x=np.sort(feature_selection)
+        else:
+          fig3.add_trace(go.Scatter(x=np.arange(basis_num), y=df.iloc[i, 5:], name=x,line=dict(color='red', width=2)))  
+        fig3.show()
+      if plot_heatmap:
+        #data.df.set_index('Num').iloc[np.where(df.iloc[:,1]==species_num),4:]
+        sum = np.sum(df.iloc[i,5:].astype(float))
+        df.iloc[i,5:]=df.iloc[i,5:].astype(float)/sum
+        arr.append(i)  
+  if plot_heatmap:
+    print(arr)
+    fig4, ax4 = plt.subplots(figsize=(30,30))  
+    ax4=sns.heatmap(df.set_index('Num').iloc[np.array(arr),4:].astype(float),annot=False,linewidths=.5,ax=ax4,vmax=0.5)
+    ax4.set_xticklabels(np.arange(210))
+
+
+
+ 
+
   
