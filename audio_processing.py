@@ -8,7 +8,7 @@ from soundscape_IR.soundscape_viewer import audio_visualization
 from soundscape_IR.soundscape_viewer import supervised_nmf
 from soundscape_IR.soundscape_viewer import lts_maker
 from dolphin_whistle.feature_learning import save_parameters_revised
-from dolphin_whistle.audio_processing import preprocessing
+
 import os
 from pandas import DataFrame
 import seaborn as sns
@@ -67,6 +67,7 @@ def preprocessing(audio,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
 
 
 class audio_processing: 
+ from dolphin_whistle.audio_processing import preprocessing
  
   def GetGdrive(self, folder_id = []):
     from pydrive.auth import GoogleAuth
