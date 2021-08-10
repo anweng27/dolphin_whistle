@@ -205,7 +205,7 @@ class audio_processing:
     feature_num=dic.shape[1]
     audio_get=lts_maker()
     model=supervised_nmf(feature_length=feature_length, basis_num=feature_num)
-    model.source_num=1
+    model.source_num=7
     model.W_cluster=np.repeat(np.arange(7),feature_num/7)
     model.W=dic 
     k=-1
