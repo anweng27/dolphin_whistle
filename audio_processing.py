@@ -245,7 +245,7 @@ class audio_processing:
                k=k+1
                sum =  np.sum(H,axis=1)
                arr = np.array([k,species,file['title'],i/model.feature_length,len(detection[:,0])])
-               stacked = np.hstack((arr.reshape(1,-1),np.flip(sum.reshape(1,-1))))
+               stacked = np.hstack((arr.reshape(1,-1),sum.reshape(1,-1)))
                print(k,file['title'],i/model.feature_length,len(detection[:,0]))
                df2 = pd.DataFrame(stacked)
                df= df.append(df2)
