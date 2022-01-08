@@ -197,7 +197,7 @@ class audio_processing:
       
     
 ###Prepare input audio files into fragments of specific lengths (for testing) and filter out empty ones 
-  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], detection_row=200, model_folder=None, vmin=None,vmax=None,feature_length=40, save_id=[], length = 5, fragment_overlap=0, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
+  def prepare_testing(self,folder_id,dictionary_name,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], activation_sec=1, model_folder=None, vmin=None,vmax=None,feature_length=40, save_id=[], length = 5, fragment_overlap=0, create_table=True, preprocess_type=2,f_range=[4000,25000],plot_type='Spectrogram',time_resolution = 0.025, window_overlap=0.5,FFT_size=256,
                       tonal_threshold=0.5, temporal_prewhiten=25, spectral_prewhiten=25,threshold=1, smooth=1,plot=True,x_prewhiten=10,y_prewhiten=80,sigma=2):
     from dolphin_whistle.audio_processing import preprocessing
     df = pd.DataFrame()
@@ -235,22 +235,40 @@ class audio_processing:
             #if there already exists a mat file for separation data
             model.load_model(filename=model_folder+file['title']+'.mat')
           if create_table==True:
+           #if the fragment is long enough 
            if model.H.shape[1]> length*model.feature_length:
+            #loop through all fragments 
             for i in range(0, model.H.shape[1], (length-fragment_overlap)*model.feature_length):
              if i+length*model.feature_length < model.H.shape[1]:
+              #select the rows for the fragment 
               detection=model.detection[(model.detection[:,0] >= (i/model.feature_length)) & (model.detection[:,0]<=(i/model.feature_length+length))]
               print(len(detection[:,0]))
-              if(len(detection[:,0])>detection_row):
-               H=model.H[:,i:i+length*model.feature_length]
-               k=k+1
-               sum =  np.sum(H,axis=1)
-               arr = np.array([k,species,file['title'],i/model.feature_length,len(detection[:,0])])
-               stacked = np.hstack((arr.reshape(1,-1),sum.reshape(1,-1)))
-               print(k,file['title'],i/model.feature_length,len(detection[:,0]))
-               df2 = pd.DataFrame(stacked)
-               df= df.append(df2)
+              #Check for consecutive activation 
+              times = detection['Time'].unique()
+              count = 1
+              bool = false
+              for i in range(0, len(times)-1):
+                if(round(times[i] + 0.0250,4) == round(times[i+1],4)): 
+                  count += 1
+                else: 
+                  count = 1
+                if(count > activation_sec * 40):
+                   bool = true
+                   break
+              #if(len(detection[:,0])>detection_row):
+              #if detected whistles is longer than specificied duration 
+              if(bool == true):
+                 H=model.H[:,i:i+length*model.feature_length]
+                 k=k+1
+                 sum =  np.sum(H,axis=1)
+                 arr = np.array([k,species,file['title'],i/model.feature_length,len(detection[:,0])])
+                 stacked = np.hstack((arr.reshape(1,-1),sum.reshape(1,-1)))
+                 print(k,file['title'],i/model.feature_length,len(detection[:,0]))
+                 df2 = pd.DataFrame(stacked)
+                 df= df.append(df2)
+              #else ignore fragment 
               else: print('not detected',file['title'],i/model.feature_length)
-             else: print('last fragment too short')
+           else: print('last fragment too short')
     df=df.rename(columns={0:'Num',1: 'Species', 2: 'File',3:'Time',4:'detection rows'})
     self.df=df 
     self.H=model.H   
