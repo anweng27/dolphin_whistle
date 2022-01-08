@@ -244,7 +244,7 @@ class audio_processing:
               detection=model.detection[(model.detection[:,0] >= (i/model.feature_length)) & (model.detection[:,0]<=(i/model.feature_length+length))]
               print(len(detection[:,0]))
               #Check for consecutive activation 
-              times = detection['Time'].unique()
+              times = detection[:,0].unique() # get time column
               count = 1
               bool = false
               for i in range(0, len(times)-1):
