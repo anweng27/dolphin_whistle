@@ -246,18 +246,18 @@ class audio_processing:
               #Check for consecutive activation 
               times = np.unique(detection[:,0]) # get time column
               count = 1
-              bool = false
+              bool = False
               for i in range(0, len(times)-1):
                 if(round(times[i] + 0.0250,4) == round(times[i+1],4)): 
                   count += 1
                 else: 
                   count = 1
                 if(count > activation_sec * 40):
-                   bool = true
+                   bool = True
                    break
               #if(len(detection[:,0])>detection_row):
               #if detected whistles is longer than specificied duration 
-              if(bool == true):
+              if(bool == True):
                  H=model.H[:,i:i+length*model.feature_length]
                  k=k+1
                  sum =  np.sum(H,axis=1)
