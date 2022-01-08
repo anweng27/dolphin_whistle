@@ -247,8 +247,8 @@ class audio_processing:
               times = np.unique(detection[:,0]) # get time column
               count = 1
               bool = False
-              for i in range(0, len(times)-1):
-                if(round(times[i] + 0.0250,4) == round(times[i+1],4)): 
+              for j in range(0, len(times)-1):
+                if(round(times[j] + 0.0250,4) == round(times[j+1],4)): 
                   count += 1
                 else: 
                   count = 1
