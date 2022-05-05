@@ -39,7 +39,7 @@ def plot_spec(input,audio):
     #cbar = fig.colorbar(im, ax=ax)
     fig = go.Figure(data=go.Heatmap(
         z=input[:,1:].T,
-        x=input[:,0],
+        x=input[:,0]*10,
         y=audio.f/1000,
         colorscale='Jet'))
     fig.show()
