@@ -321,17 +321,16 @@ class audio_processing:
      ax4.set_xticklabels(np.arange(210))
    
    
-  def feature_activation_plot(self,table, y_axis,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], avg_x = True, basis_num=10, zmax = 1, width = 1000, height = 1000):
+  def feature_activation_plot(self,table, y_axis,species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], avg = True, basis_num=10, zmax = 1, width = 1000, height = 1000):
    import plotly.graph_objects as go
    x1 = np.array(np.arange(1,self.df.shape[1]-4), dtype=np.str)
    x2 = np.array(np.repeat(species_list,basis_num), dtype=np.str)
    new_x = np.char.add(x1, x2)
-   #mid = pd.DataFrame(np.arange(data.df.shape[0]).astype(str))
-   #y = data.df['Num'] + mid + data.df['Species'].astype(str))
+   temp['Name'] = data.df['Num'].astype(str) +"-"+ data.df["Species"]
    if avg_x:
-    fig = go.Figure(data=go.Heatmap(z=table, x=x2,y=np.array(y_axis),colorscale='Viridis'))
+    fig = go.Figure(data=go.Heatmap(z=table, x=x2,y=temp['Name'],colorscale='Viridis'))
    if !avg_x:
-    fig = go.Figure(data=go.Heatmap(z=table, x=new_array,y=np.array(y_axis),colorscale='Viridis'))
+    fig = go.Figure(data=go.Heatmap(z=table, x=new_array,y=temp['Name'],colorscale='Viridis'))
    fig.update_layout(
       title='Feature Usage Pattern',
       xaxis_nticks=70,width=700, height=500)
