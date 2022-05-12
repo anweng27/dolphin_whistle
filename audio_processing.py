@@ -321,7 +321,7 @@ class audio_processing:
      ax4.set_xticklabels(np.arange(210))
    
    
-  def feature_activation_plot(self,table, species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], avg = True, basis_num=10, zmax = 1, width = 1000, height = 1000):
+  def feature_activation_plot(self,table, species_list=['Gg','Gm','Lh','Pc','Sa','Sl','Tt'], avg_x = True, basis_num=10, zmax = 1, width = 1000, height = 1000):
     import plotly.graph_objects as go
     x1 = np.array(np.arange(1,self.df.shape[1]-4), dtype=np.str)
     x2 = np.array(np.repeat(species_list,basis_num), dtype=np.str)
