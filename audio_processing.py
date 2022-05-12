@@ -327,11 +327,11 @@ class audio_processing:
     x2 = np.array(np.repeat(species_list,basis_num), dtype=np.str)
     new_x = np.char.add(x1, x2)
     temp = pd.DataFrame()
-    temp['Name'] = self.df['Num'].astype(str) +"-"+ self.df["Species"]
+    temp['Name'] = table.iloc[:,5:]['Num'].astype(str) +"-"+ table.iloc[:,5:]["Species"]
     if avg_x == True:
-     fig = go.Figure(data=go.Heatmap(z=table, x=x2,y=temp['Name'],colorscale='Viridis'))
+     fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=x2,y=temp['Name'],colorscale='Viridis'))
     if avg_x == False:
-     fig = go.Figure(data=go.Heatmap(z=table, x=new_array,y=temp['Name'],colorscale='Viridis'))
+     fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=new_array,y=temp['Name'],colorscale='Viridis'))
     fig.update_layout(
        title='Feature Usage Pattern',
        xaxis_nticks=70,width=700, height=500)
