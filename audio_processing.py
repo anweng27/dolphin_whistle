@@ -327,7 +327,7 @@ class audio_processing:
     x2 = np.array(np.repeat(species_list,basis_num), dtype=np.str)
     new_x = np.char.add(x1, x2)
     temp = pd.DataFrame()
-    temp['Name'] = table['Num'].astype(str) +"-"+ table["Species"]
+    temp['Name'] = table['Num'].astype(str) +"-"+ table["Species"].astype(str)
     if avg_x == True:
      fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=x2,y=temp['Name'],colorscale='Viridis'))
     if avg_x == False:
