@@ -327,7 +327,7 @@ class audio_processing:
     x2 = np.array(np.repeat(species_list,basis_num), dtype=np.str)
     new_x = np.char.add(x1, x2)
     if avg_x == False:
-     fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=new_x, y=[y,num], colorscale='Viridis'))
+     fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=[x1,x2], y=[y,num], colorscale='Viridis'))
     if avg_x == True: 
      fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=x2, y=[y,num], colorscale='Viridis')) 
     fig.update_layout(
