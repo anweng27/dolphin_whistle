@@ -242,7 +242,7 @@ class audio_processing:
              if i+length*model.feature_length < model.H.shape[1]:
               #select the rows for the fragment 
               detection=model.detection[(model.detection[:,0] >= (i/model.feature_length)) & (model.detection[:,0]<=(i/model.feature_length+length))]
-              print(len(detection[:,0]))
+              #print(len(detection[:,0]))
               #Check for consecutive activation 
               times = np.unique(detection[:,0]) # get time column
               count = 1
