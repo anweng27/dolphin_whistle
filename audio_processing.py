@@ -331,7 +331,7 @@ class audio_processing:
     if avg_x == True: 
      fig = go.Figure(data=go.Heatmap(z=table.iloc[:,5:], x=x2, y=[y,num], colorscale='Viridis')) 
     fig.update_layout(
-       title='Feature Usage Pattern',
+       title='Feature Usage Pattern', xaxis_title="Features", yaxis_title="Fragments",
        xaxis_nticks=x_ticks, yaxis_nticks=y_ticks ,width=width, height=height)
     fig.data[0].update(zmin=0, zmax=zmax)
     fig.show()
