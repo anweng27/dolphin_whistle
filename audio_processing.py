@@ -157,6 +157,9 @@ class audio_processing:
         temp= self.filelist[file_no]
         temp.GetContentFile(temp['title'])
         audio = audio_visualization(title, plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, offset_read=offset_read, duration_read=duration_read, f_range=f_range,FFT_size=FFT_size)
+        if audio.sf==96000:
+           audio = audio_visualization(title, plot_type=plot_type,
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size/2)
       self.duration = audio.data[-1,0]-audio.data[0,0]
       print(audio.data.shape)
       if preprocess_type==1:
@@ -177,6 +180,9 @@ class audio_processing:
           temp.GetContentFile(title)
           audio = audio_visualization(title, plot_type=plot_type,
               time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size)
+          if audio.sf==96000:
+           audio = audio_visualization(title, plot_type=plot_type,
+              time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size/2)
         if preprocess_type==1:
           processed_spec = preprocessing(audio, plot=plot,x_prewhiten=preprocess_x_prewhiten,y_prewhiten=preprocess_y_prewhiten,sigma=preprocess_sigma)
         if preprocess_type==2:
