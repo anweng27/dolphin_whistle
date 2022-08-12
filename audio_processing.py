@@ -227,6 +227,8 @@ class audio_processing:
               self.duration=temp.duration
               duration = int(temp.duration)
             audio = audio_visualization(file['title'], plot_type=plot_type,time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, vmin=vmin, vmax=vmax,FFT_size=FFT_size)
+            if audio.sf==96000:
+             audio = audio_visualization(title, plot_type=plot_type, time_resolution=time_resolution, window_overlap=window_overlap, f_range=f_range, offset_read=offset_read, duration_read=duration_read, FFT_size=FFT_size/2)
             if preprocess_type==1:
               processed_spec = preprocessing(audio, plot=plot,x_prewhiten=x_prewhiten,y_prewhiten=y_prewhiten,sigma=sigma)
             if preprocess_type==2:
